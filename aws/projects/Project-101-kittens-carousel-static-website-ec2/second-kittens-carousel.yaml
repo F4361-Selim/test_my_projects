@@ -13,10 +13,10 @@ Description: |
 
   
 Resources:
-  Web-Server-Sec-Grp:
+  WebServerSecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enables SSH and HTTP # Required
+      GroupDescription: Enable SSH and HTTP # Required
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -34,17 +34,17 @@ Resources:
       InstanceType: t2.micro
       KeyName: firstkey
       SecurityGroupIds:
-        - !Ref Web-Server-Sec-Grp
+        - !Ref WebServerSecGrp
       Tags:
         - Key: Name
           Value: !Sub Web Server of $${AWS::StackName} Stack
       UserData: 
         Fn::Base64:
-          !Sub 
+          !Sub |
             #! /bin/bash
             yum update -y
             yum install httpd -y
-            FOLDER="https://raw.githubusercontent.com/F4361-Selim/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web"
+            FOLDER="https://raw.githubusercontent.com/F4361-Selim/test_my_projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web"
             cd /var/www/html
             wget $FOLDER/index.html
             wget $FOLDER/cat0.jpg
@@ -55,3 +55,8 @@ Resources:
             systemctl enable httpd 
   
 Outputs:
+  WebsiteURL:
+    Value: !Sub
+      - http://${PublicAddress}
+      - PublicAddress: !GetAtt WebServerInstance.PublicDnsName
+    Description: Kittens Carousel Application URL
